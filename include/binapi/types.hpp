@@ -7,6 +7,8 @@
 // This file is part of binapi(https://github.com/niXman/binapi) project.
 //
 // Copyright (c) 2019-2021 niXman (github dot nixman dog pm.me). All rights reserved.
+// References
+//   - https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md
 // ----------------------------------------------------------------------------
 
 #ifndef __binapi__types_hpp
@@ -34,14 +36,23 @@ namespace binapi {
 
 namespace rest {
 
+// Test connvectivity
+// https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#test-connectivity
+// Response: json format
+// {}
 struct ping_t {
     bool ok;
 
     static ping_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const ping_t &f);
+    friend std::ostream& operator<<(std::ostream &os, const ping_t &f);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#check-server-time
+// Check server time
+// https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#check-server-time
+// Response: json format
+// {
+//    "serverTime" : 1499827319559  
+// }
 struct server_time_t {
     std::size_t serverTime;
 
@@ -49,7 +60,15 @@ struct server_time_t {
     friend std::ostream &operator<<(std::ostream &os, const server_time_t &f);
 };
 
+// Current average price
 // https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#current-average-price
+// Request : GET /api/v3/avgPrice
+// Parameters: symbol(STRING)
+// Reponse
+// {
+//    "mins":5,
+//    "price":"9.35751834"  
+// }
 struct avg_price_t {
     std::size_t mins;
     double_type price;
@@ -58,18 +77,38 @@ struct avg_price_t {
     friend std::ostream &operator<<(std::ostream &os, const avg_price_t &f);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#symbol-price-ticker
+// Symbol price ticker
+// https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#symbol-price-ticker
+// Request : GET /api/v3/ticker/price
+// Parameter : symbol(STRING)
+// If the symbol is not sent, prices for all symbols will be returned in an array
+// Reponse
+// {
+//    "symbol": "LTCBTC",
+//    "price": "4.00000200"  
+// }
+//  [
+//    {
+//      "symbol": "LTCBTC",
+//      "price": "4.00000200"  
+//    },
+//    {
+//      "symbol": "ETHBTC",
+//      "price": "0.07946600"  
+//    }
+// ]
+
 struct prices_t {
     struct price_t {
         std::string symbol;
         double_type price;
 
         static price_t construct(const flatjson::fjson &json);
-        friend std::ostream &operator<<(std::ostream &os, const price_t &f);
+        friend std::ostream& operator<<(std::ostream &os, const price_t &f);
     };
 
     static prices_t construct(const flatjson::fjson &json);
-    friend std::ostream &operator<<(std::ostream &os, const prices_t &f);
+    friend std::ostream& operator<<(std::ostream &os, const prices_t &f);
 
     std::map<std::string, price_t> prices;
 
@@ -82,7 +121,10 @@ struct prices_t {
     const price_t& get_by_symbol(const char *sym) const;
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#24hr-ticker-price-change-statistics
+// 24hr ticker price change statistics
+// Request : GET /api/v3/ticker/24hr
+// https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#24hr-ticker-price-change-statistics
+// 24 hour rolling window price change statistics
 struct _24hrs_tickers_t {
     struct _24hrs_ticker_t {
         std::string symbol;
@@ -115,7 +157,9 @@ struct _24hrs_tickers_t {
     friend std::ostream &operator<<(std::ostream &os, const _24hrs_tickers_t &f);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#account-information-user_data
+// Account information
+// Request : GET /api/v3/account (HMAC SHA256)
+// https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#account-information-user_data
 struct account_info_t {
     std::size_t makerCommission;
     std::size_t takerCommission;
@@ -152,7 +196,7 @@ struct account_info_t {
     friend std::ostream &operator<<(std::ostream &os, const account_info_t &f);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#exchange-information
+//https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#exchange-information
 struct exchange_info_t {
     std::string timezone;
     std::size_t serverTime;
@@ -287,7 +331,7 @@ struct exchange_info_t {
     friend std::ostream& operator<<(std::ostream &os, const exchange_info_t &s);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#order-book
+//https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#order-book
 struct depths_t {
     struct depth_t {
         double_type price;
@@ -304,7 +348,7 @@ struct depths_t {
     friend std::ostream &operator<<(std::ostream &os, const depths_t &s);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#recent-trades-list
+//https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#recent-trades-list
 struct trades_t {
     struct trade_t {
         std::size_t id;
@@ -324,7 +368,7 @@ struct trades_t {
     friend std::ostream &operator<<(std::ostream &os, const trades_t &s);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#compressedaggregate-trades-list
+//https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#compressedaggregate-trades-list
 struct agg_trades_t {
     struct agg_trade_t {
         std::size_t id;
@@ -346,7 +390,7 @@ struct agg_trades_t {
     friend std::ostream &operator<<(std::ostream &os, const agg_trades_t &s);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#klinecandlestick-data
+//https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#klinecandlestick-data
 struct klines_t {
     struct kline_t {
         std::size_t start_time;
@@ -370,7 +414,7 @@ struct klines_t {
     friend std::ostream &operator<<(std::ostream &os, const klines_t &s);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#query-order-user_data
+//https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#query-order-user_data
 struct order_info_t {
     std::string symbol;
     std::size_t orderId;
@@ -393,8 +437,8 @@ struct order_info_t {
     friend std::ostream &operator<<(std::ostream &os, const order_info_t &o);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#current-open-orders-user_data
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#all-orders-user_data
+//https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#current-open-orders-user_data
+//https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#all-orders-user_data
 struct orders_info_t {
     std::map<std::string, std::vector<order_info_t>> orders;
 
@@ -402,7 +446,7 @@ struct orders_info_t {
     friend std::ostream &operator<<(std::ostream &os, const orders_info_t &o);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#new-order--trade
+//https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#new-order--trade
 struct new_order_info_ack_t {
     std::string symbol;
     std::size_t orderId;
@@ -461,7 +505,7 @@ struct new_order_info_full_t {
     friend std::ostream &operator<<(std::ostream &os, const new_order_info_full_t &o);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#test-new-order-trade
+//https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#test-new-order-trade
 struct new_test_order_info_t {
     bool ok;
 
@@ -555,7 +599,7 @@ struct new_order_resp_type
     friend std::ostream &operator<<(std::ostream &os, const new_order_resp_type &o);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#cancel-order-trade
+//https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#cancel-order-trade
 struct cancel_order_info_t {
     std::string symbol;
     std::size_t orderId;
@@ -574,7 +618,7 @@ struct cancel_order_info_t {
     friend std::ostream &operator<<(std::ostream &os, const cancel_order_info_t &o);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#account-trade-list-user_data
+//https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#account-trade-list-user_data
 struct my_trades_info_t {
     struct my_trade_info_t {
         std::string symbol;
@@ -601,7 +645,7 @@ struct my_trades_info_t {
 
 /*************************************************************************************************/
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#start-user-data-stream-user_stream
+//https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#start-user-data-stream-user_stream
 struct start_user_data_stream_t {
     std::string listenKey;
 
@@ -609,7 +653,7 @@ struct start_user_data_stream_t {
     friend std::ostream &operator<<(std::ostream &os, const start_user_data_stream_t &o);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#keepalive-user-data-stream-user_stream
+//https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#keepalive-user-data-stream-user_stream
 struct ping_user_data_stream_t {
     bool ok;
 
@@ -617,7 +661,7 @@ struct ping_user_data_stream_t {
     friend std::ostream &operator<<(std::ostream &os, const ping_user_data_stream_t &o);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#close-user-data-stream-user_stream
+//https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#close-user-data-stream-user_stream
 struct close_user_data_stream_t {
     bool ok;
 
@@ -636,8 +680,7 @@ struct close_user_data_stream_t {
 namespace ws {
 
 /*************************************************************************************************/
-
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#aggregate-trade-streams
+//https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#aggregate-trade-streams
 struct agg_trade_t {
     std::string e; // Event type
     std::size_t E; // Event time
@@ -655,7 +698,7 @@ struct agg_trade_t {
     friend std::ostream &operator<<(std::ostream &os, const agg_trade_t &o);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#trade-streams
+//https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#trade-streams
 struct trade_t {
     std::size_t E; // Event time
     std::string s; // Symbol
@@ -674,8 +717,8 @@ struct trade_t {
 
 /*************************************************************************************************/
 
-// https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#partial-book-depth-streams
-struct part_depths_t {
+//https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#partial-book-depth-streams
+truct part_depths_t {
     struct depth_t {
         double_type price;
         double_type amount;
@@ -692,7 +735,7 @@ struct part_depths_t {
 
 /*************************************************************************************************/
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#diff-depth-stream
+//https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#diff-depth-stream
 struct diff_depths_t {
     struct depth_t {
         double_type price;
@@ -714,7 +757,7 @@ struct diff_depths_t {
 
 /*************************************************************************************************/
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#klinecandlestick-streams
+//https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#klinecandlestick-streams
 struct kline_t {
     std::size_t E; // Event time
     std::string s; // Symbol
@@ -743,7 +786,7 @@ std::ostream& ohlc(std::ostream &os, const kline_t &o);
 
 /*************************************************************************************************/
 
-// https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-mini-ticker-stream
+//https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-mini-ticker-stream
 struct mini_ticker_t {
     std::size_t E; // Event time
     std::string s; // Symbol
@@ -768,7 +811,7 @@ struct mini_tickers_t {
 
 /*************************************************************************************************/
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#individual-symbol-ticker-streams
+//https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-ticker-streams
 struct market_ticker_t {
     std::size_t E; // Event time
     std::string s; // Symbol
@@ -797,7 +840,7 @@ struct market_ticker_t {
     friend std::ostream& operator<<(std::ostream &os, const market_ticker_t &o);
 };
 
-// https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#all-market-tickers-stream
+//https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#all-market-tickers-stream
 struct markets_tickers_t {
     std::map<std::string, market_ticker_t> tickers;
 
@@ -807,7 +850,7 @@ struct markets_tickers_t {
 
 /*************************************************************************************************/
 
-// https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-book-ticker-streams
+//https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md#individual-symbol-book-ticker-streams
 struct book_ticker_t {
     std::size_t u;
     std::string s;
@@ -832,7 +875,7 @@ namespace userdata {
 
 /*************************************************************************************************/
 
-// https://github.com/binance/binance-spot-api-docs/blob/master/user-data-stream.md#account-update
+//https://github.com/binance/binance-spot-api-docs/blob/master/user-data-stream.md#account-update
 struct account_update_t {
     struct balance_t {
         std::string a;
@@ -853,7 +896,7 @@ struct account_update_t {
 
 /*************************************************************************************************/
 
-// https://github.com/binance/binance-spot-api-docs/blob/master/user-data-stream.md#balance-update
+//https://github.com/binance/binance-spot-api-docs/blob/master/user-data-stream.md#balance-update
 struct balance_update_t {
     std::string e;
     std::size_t E;
@@ -867,7 +910,7 @@ struct balance_update_t {
 
 /*************************************************************************************************/
 
-// https://github.com/binance/binance-spot-api-docs/blob/master/user-data-stream.md#order-update
+//https://github.com/binance/binance-spot-api-docs/blob/master/user-data-stream.md#order-update
 struct order_update_t {
     std::string e;
     std::size_t E;
